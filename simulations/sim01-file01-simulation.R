@@ -22,7 +22,7 @@ lines(A_test, outro$ests_splmod, lwd = 5, col = 'red')
 
 # ------------------------------------------------------------------------
 # Simulation ------
-n_sims <- 20
+n_sims <- 100
 options(cores = 20)
 cl <- makeCluster(20)
 registerDoParallel(cl)

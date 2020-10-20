@@ -44,6 +44,18 @@ ests_lmmod2 <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_lmmo
                                                               x$npcbps3$ests_lmmod2,
                                                               x$npcbps4$ests_lmmod2)))
 
+ests_splmod <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_splmod,
+                                                               x$eb1$ests_splmod,
+                                                               x$eb2$ests_splmod,
+                                                               x$eb3$ests_splmod,
+                                                               x$eb4$ests_splmod,
+                                                               x$lm$ests_splmod,
+                                                               x$cbps$ests_splmod,
+                                                               x$npcbps1$ests_splmod,
+                                                               x$npcbps2$ests_splmod,
+                                                               x$npcbps3$ests_splmod,
+                                                               x$npcbps4$ests_splmod)))
+
 betas <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$regbal[1,],
                                                          x$eb1$regbal[1,],
                                                          x$eb2$regbal[1,],
@@ -105,21 +117,25 @@ ess_max <- t(apply(abs(ess),2,function(x) apply(x, 1, max)))
 bias1 <- apply(apply(ests_lmmod1, 2, function(x) apply(x, 2, function(x) x - truth)),2,mean)
 bias2 <- apply(apply(ests_lmmod2, 2, function(x) apply(x, 2, function(x) x - truth)),2,mean)
 bias3 <- apply(apply(ests_loess, 2, function(x) apply(x, 2, function(x) x - truth)),2,mean)
+bias4 <- apply(apply(ests_splmod, 2, function(x) apply(x, 2, function(x) x - truth)),2,mean)
 
 bias_quant1 <- apply(apply(ests_lmmod1, 2, function(x) apply(x, 2, function(x) x - truth)),2,quantile, c(0.05,0.25, 0.75,0.95))
 bias_quant2 <- apply(apply(ests_lmmod2, 2, function(x) apply(x, 2, function(x) x - truth)),2,quantile, c(0.05,0.25, 0.75,0.95))
 bias_quant3 <- apply(apply(ests_loess, 2, function(x) apply(x, 2, function(x) x - truth)),2,quantile, c(0.05,0.25, 0.75,0.95))
+bias_quant4 <- apply(apply(ests_splmod, 2, function(x) apply(x, 2, function(x) x - truth)),2,quantile, c(0.05,0.25, 0.75,0.95))
 
 absbias1 <- apply(apply(ests_lmmod1, 2, function(x) apply(x, 2, function(x) abs(x - truth))),2,mean)
 absbias2 <- apply(apply(ests_lmmod2, 2, function(x) apply(x, 2, function(x) abs(x - truth))),2,mean)
 absbias3 <- apply(apply(ests_loess, 2, function(x) apply(x, 2, function(x) abs(x - truth))),2,mean)
+absbias4 <- apply(apply(ests_splmod, 2, function(x) apply(x, 2, function(x) abs(x - truth))),2,mean)
 
 mse1 <- apply(apply(ests_lmmod1, 2, function(x) apply(x, 2, function(x) mse(x, truth))),2,mean)
 mse2 <- apply(apply(ests_lmmod2, 2, function(x) apply(x, 2, function(x) mse(x, truth))),2,mean)
 mse3 <- apply(apply(ests_loess, 2, function(x) apply(x, 2, function(x) mse(x, truth))),2,mean)
+mse4 <- apply(apply(ests_splmod, 2, function(x) apply(x, 2, function(x) mse(x, truth))),2,mean)
 
 
-msetab <- cbind(mse1, mse2, mse3)
+msetab <- cbind(mse1, mse2, mse3, mse4)
 
 set.seed(20200108)
 
@@ -234,6 +250,34 @@ plot_sim(t(ests_lmmod2[,11,]), atest = A_test, truth = truth, aquants = Aquants,
          ylimits = c(-5,12), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 dev.off()
 
+
+pdf('paper-figures/eb-response-splmod.pdf', height = 4, width = 12)
+par(mfrow=c(2,5), oma = c(0,0,0,0), mar = c(4,4,2,2)+0.1)
+plot_sim(t(ests_splmod[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Unweighted')
+plot_sim(t(ests_splmod[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+plot_sim(t(ests_splmod[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+plot_sim(t(ests_splmod[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+plot_sim(t(ests_splmod[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+
+plot_sim(t(ests_splmod[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'Linear Model')
+plot_sim(t(ests_splmod[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+plot_sim(t(ests_splmod[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+plot_sim(t(ests_splmod[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+plot_sim(t(ests_splmod[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
+         ylimits = c(-5,12), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+dev.off()
+
+
+
 # Tables -------------------------
 
 baltab1 <- cbind(betastab_mean, cortab_mean, kstab_mean)
@@ -254,7 +298,7 @@ xtable::xtable(baltab2, digits = 3)
 
 # Estimates -----
 
-restab <- cbind(t(ess_tab), bias1, bias2, bias3, absbias1, absbias2, absbias3, msetab)
+restab <- cbind(t(ess_tab), bias1, bias2, bias3, bias4, absbias1, absbias2, absbias3, absbias4, msetab)
 rownames(restab) <- c('Unweighted',
                       'Entropy Balancing (1)',
                       'Entropy Balancing (2)',
@@ -306,22 +350,24 @@ for(c in 1:length(bias1)){
   if(c == 7 | c == 1 | c == 6) next 
   print(c)
   plot(0, 
-       xlim = range(c(bias_quant1[,2:11],bias_quant2[,2:11],bias_quant3[,2:11])), 
-       ylim = c(0.5, 3.5),
+       xlim = range(c(bias_quant1[,2:11],bias_quant2[,2:11],bias_quant3[,2:11],bias_quant4[,2:11])), 
+       ylim = c(0.5, 4.5),
        main = headings[c],
        ylab = '',
        xlab = 'Bias',
        axes = F)
   abline(v = 0, lwd = 3, col = rgb(0,0,0,0.25))
   axis(1)
-  axis(2, at = 3:1, c('LOESS', 'Correct Spec.', 'Misspecified'), las = 2)
-  points(c(bias1[c], bias2[c], bias3[c]), c(3,2,1), pch = 19,)
+  axis(2, at = 4:1, c('B-Spline', 'LOESS', 'Correct Spec.', 'Misspecified'), las = 2)
+  points(c(bias1[c], bias2[c], bias3[c], bias4[c]), c(4,3,2,1), pch = 19,)
   lines(bias_quant1[c(1,4),c], rep(1,2), col = rgb(0,0,0,0.5))
   lines(bias_quant2[c(1,4),c], rep(2,2), col = rgb(0,0,0,0.5))
   lines(bias_quant3[c(1,4),c], rep(3,2), col = rgb(0,0,0,0.5))
+  lines(bias_quant4[c(1,4),c], rep(4,2), col = rgb(0,0,0,0.5))
   points(bias_quant1[,c], rep(1,4), pch = 4)
   points(bias_quant2[,c], rep(2,4), pch = 4)
   points(bias_quant3[,c], rep(3,4), pch = 4)
+  points(bias_quant4[,c], rep(4,4), pch = 4)
   # lines()
 }
 dev.off()
