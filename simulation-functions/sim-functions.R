@@ -9,13 +9,13 @@ model_estimation <- function(dat,
                              poly_reg = T, p = 1,
                              testpts, nm = 2,
                              which_model = 'EB'){
-
-  span <- loess_split_sample(dat$Y, dat$A, dat[,3:5],
+  
+  span <- loess_split_sample(dat$Y, dat$A, dat[,3:7],
                              spans = seq(0.05,1,0.05),
                              n_moments = nm,
                              plot_curves = F,
                              model = which_model)
-  dfs <- bspline_split_sample(dat$Y, dat$A, dat[,3:5], n_moments = nm,
+  dfs <- bspline_split_sample(dat$Y, dat$A, dat[,3:7], n_moments = nm,
                               plot_curves = F, model = which_model)
   loessmod <- loess(Y ~ A,
                     weights = wts,
@@ -38,9 +38,9 @@ model_estimation <- function(dat,
       'ests_lmmod2' = predict(lmmod2, newdata = data.frame(A = testpts)),
       'ests_splmod' = predict(splmod, newdata = data.frame(A = testpts)),
       'ess' = (sum(wts))^2 / sum(wts^2),
-      'ksstats' = apply(dat[,2:5], 2, function(x) check_ks_stat(x, wts)),
-      'regbal' = apply(dat[3:5], 2, function(x) lm_ps(x, dat$A, wts = wts)$ests[2,]),
-      'cors' = apply(dat[,3:5], 2, function(x) wcor(wts, x, dat[,2]))
+      'ksstats' = apply(dat[,2:7], 2, function(x) check_ks_stat(x, wts)),
+      'regbal' = apply(dat[3:7], 2, function(x) lm_ps(x, dat$A, wts = wts)$ests[2,]),
+      'cors' = apply(dat[,3:7], 2, function(x) wcor(wts, x, dat[,2]))
     )
   )
 }
@@ -52,7 +52,7 @@ bsest <- function(X, simdat, testpts) {
   bsamp <- sample(1:nrow(simdat), nrow(simdat), replace = T)
   datbs <- simdat[bsamp, ]
   
-  C <- makeC2(datbs[,3:5], datbs$A, n_moments = 3)
+  C <- makeC2(datbs[,3:7], datbs$A, n_moments = 3)
   eb <- entbal::entbal_fit(C, rep(0,ncol(C)),
                            n_moments = 1, 
                            verbose = F,

@@ -21,28 +21,28 @@ ests_loess <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_loess
                                                               x$npcbps3$ests_loess,
                                                               x$npcbps4$ests_loess)))
 ests_lmmod1 <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_lmmod1,
-                                                              x$eb1$ests_lmmod1,
-                                                              x$eb2$ests_lmmod1,
-                                                              x$eb3$ests_lmmod1,
-                                                              x$eb4$ests_lmmod1,
-                                                              x$lm$ests_lmmod1,
-                                                              x$cbps$ests_lmmod1,
-                                                              x$npcbps1$ests_lmmod1,
-                                                              x$npcbps2$ests_lmmod1,
-                                                              x$npcbps3$ests_lmmod1,
-                                                              x$npcbps4$ests_lmmod1)))
+                                                               x$eb1$ests_lmmod1,
+                                                               x$eb2$ests_lmmod1,
+                                                               x$eb3$ests_lmmod1,
+                                                               x$eb4$ests_lmmod1,
+                                                               x$lm$ests_lmmod1,
+                                                               x$cbps$ests_lmmod1,
+                                                               x$npcbps1$ests_lmmod1,
+                                                               x$npcbps2$ests_lmmod1,
+                                                               x$npcbps3$ests_lmmod1,
+                                                               x$npcbps4$ests_lmmod1)))
 
 ests_lmmod2 <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_lmmod2,
-                                                              x$eb1$ests_lmmod2,
-                                                              x$eb2$ests_lmmod2,
-                                                              x$eb3$ests_lmmod2,
-                                                              x$eb4$ests_lmmod2,
-                                                              x$lm$ests_lmmod2,
-                                                              x$cbps$ests_lmmod2,
-                                                              x$npcbps1$ests_lmmod2,
-                                                              x$npcbps2$ests_lmmod2,
-                                                              x$npcbps3$ests_lmmod2,
-                                                              x$npcbps4$ests_lmmod2)))
+                                                               x$eb1$ests_lmmod2,
+                                                               x$eb2$ests_lmmod2,
+                                                               x$eb3$ests_lmmod2,
+                                                               x$eb4$ests_lmmod2,
+                                                               x$lm$ests_lmmod2,
+                                                               x$cbps$ests_lmmod2,
+                                                               x$npcbps1$ests_lmmod2,
+                                                               x$npcbps2$ests_lmmod2,
+                                                               x$npcbps3$ests_lmmod2,
+                                                               x$npcbps4$ests_lmmod2)))
 
 ests_splmod <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_splmod,
                                                                x$eb1$ests_splmod,
@@ -333,16 +333,16 @@ knitr::kable(restab, digits = 3)
 # 
 
 headings <- c('Unweighted',
-                      'Entropy Balancing (1)',
-                      'Entropy Balancing (2)',
-                      'Entropy Balancing (3)',
-                      'Entropy Balancing (4)',
-                      'Linear Model',
-                      'CBPS - Parametric',
-                      'CBPS - Nonparametric: (1)',
-                      'CBPS - Nonparametric: (2)',
-                      'CBPS - Nonparametric: (3)',
-                      'CBPS - Nonparametric: (4)')
+              'Entropy Balancing (1)',
+              'Entropy Balancing (2)',
+              'Entropy Balancing (3)',
+              'Entropy Balancing (4)',
+              'Linear Model',
+              'CBPS - Parametric',
+              'CBPS - Nonparametric: (1)',
+              'CBPS - Nonparametric: (2)',
+              'CBPS - Nonparametric: (3)',
+              'CBPS - Nonparametric: (4)')
 
 pdf('paper-figures/sim1-bias-dists.pdf', height = 3.5, width = 12)
 par(mfrow=c(2,4), oma = c(0,0,0,0), mar = c(4,6,2,2)+0.1)
@@ -359,7 +359,7 @@ for(c in 1:length(bias1)){
   abline(v = 0, lwd = 3, col = rgb(0,0,0,0.25))
   axis(1)
   axis(2, at = 4:1, c('B-Spline', 'LOESS', 'Correct Spec.', 'Misspecified'), las = 2)
-  points(c(bias1[c], bias2[c], bias3[c], bias4[c]), c(4,3,2,1), pch = 19,)
+  points(c(bias1[c], bias2[c], bias3[c], bias4[c]), c(1,2,3,4), pch = 19,)
   lines(bias_quant1[c(1,4),c], rep(1,2), col = rgb(0,0,0,0.5))
   lines(bias_quant2[c(1,4),c], rep(2,2), col = rgb(0,0,0,0.5))
   lines(bias_quant3[c(1,4),c], rep(3,2), col = rgb(0,0,0,0.5))

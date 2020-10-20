@@ -17,49 +17,58 @@ simrun <- function(X,
   
   X1 <- rnorm(n_obs, mean = MX1, sd = 1)
   X2 <- rnorm(n_obs, mean = MX2, sd = 1)
-  X3 <- rbinom(n_obs, 1, prob = MX3)
+  X3 <- rnorm(n_obs, mean = 0, sd = 1)
+  X4 <- rnorm(n_obs, mean = MX2, sd = 1)
+  X5 <- rbinom(n_obs, 1, prob = MX3)
   
-  muA <- 5 * abs(X1) + 6 * abs(X2) + 3 * abs(X3)
+  Z1 <- exp(X1 / 2)
+  Z2 <- (X2 / (1 + exp(X1))) + 10
+  Z3 <- (X1 * X3 / 25) + 0.6
+  Z4 <- (X4 - MX2)**2 
+  Z5 <- X5
+  
+  
+  muA <- 5 * abs(X1) + 6 * abs(X2) + 3 * abs(X5) + abs(X4)
   
   A <- rchisq(n_obs, df = 3, ncp = muA)
   
   if(a_effect){
-    Y <- - (A + 5) * (A - 5) / 300 + A * (X1^2 + X2^2) / 25 + X1 + X2 + X3 + rnorm(n_obs, sd = 1)
+    Y <- - (A + 5) * (A - 5) / 300 + A * (X1^2 + X2^2) / 25 + X1 + X2 + X5 + rnorm(n_obs, sd = 1)
     truth <- - (A_test + 5) * (A_test - 5) / 300 + A_test * (2 + MX1^2 + MX2^2) / 25 + MX1 + MX2 + MX3
   } else {
-    Y <- X1 + X1^2 + X2 + X2^2 + X1 * X2 + X3 + rnorm(n_obs, sd = 1)
+    Y <- X1 + X1^2 + X2 + X2^2 + X1 * X2 + X5 + rnorm(n_obs, sd = 1)
     truth <- rep(MX1 + (MX1^2 + 1) + MX2 + (MX2^2 + 1) + MX1 * MX2 + MX3 , 100)
   }
   
-  datz <- data.frame(Y, A, X1, X2, X3)
+  datz <- data.frame(Y, A, 'X1' = Z1, 'X2' = Z2, 'X3' = Z3, 'X4' = Z4, 'X5' = Z5)
   
   # Weights Estimation -----------------------
   
   # Entopy Balancing
-  CZ1 <- makeC2(datz[,3:5], datz$A, n_moments = 1)
-  CZ2 <- makeC2(datz[,3:5], datz$A, n_moments = 2)
-  CZ3 <- makeC2(datz[,3:5], datz$A, n_moments = 3)
-  CZ4 <- makeC2(datz[,3:5], datz$A, n_moments = 4)
+  CZ1 <- makeC2(datz[,3:7], datz$A, n_moments = 1)
+  CZ2 <- makeC2(datz[,3:7], datz$A, n_moments = 2)
+  CZ3 <- makeC2(datz[,3:7], datz$A, n_moments = 3)
+  CZ4 <- makeC2(datz[,3:7], datz$A, n_moments = 4)
   
   ebz1 <- entbal_fit(CZ1, rep(0,ncol(CZ1)), 
-                             n_moments = 1, 
-                             verbose = verbose, opt_constraints = c(-250,250),
-                             bal_tol = 1e-8)
+                     n_moments = 1, 
+                     verbose = verbose, opt_constraints = c(-250,250),
+                     bal_tol = 1e-8)
   
   ebz2 <- entbal_fit(CZ2, rep(0,ncol(CZ2)), 
-                             n_moments = 1, 
-                             verbose = verbose, opt_constraints = c(-250,250),
-                             bal_tol = 1e-8)
+                     n_moments = 1, 
+                     verbose = verbose, opt_constraints = c(-250,250),
+                     bal_tol = 1e-8)
   
   ebz3 <- entbal_fit(CZ3, rep(0,ncol(CZ3)), 
-                             n_moments = 1, 
-                             verbose = verbose, opt_constraints = c(-250,250),
-                             bal_tol = 1e-8)
+                     n_moments = 1, 
+                     verbose = verbose, opt_constraints = c(-250,250),
+                     bal_tol = 1e-8)
   
   ebz4 <- entbal_fit(CZ4, rep(0,ncol(CZ4)), 
-                             n_moments = 1, 
-                             verbose = verbose, opt_constraints = c(-250,250),
-                             bal_tol = 1e-8)
+                     n_moments = 1, 
+                     verbose = verbose, opt_constraints = c(-250,250),
+                     bal_tol = 1e-8)
   
   datz$W1 <- ebz1$wts
   datz$W2 <- ebz2$wts
@@ -75,27 +84,27 @@ simrun <- function(X,
   
   if(!lite_version){
     # linear model weights
-    ps_lm_mod <- lm(A ~ X1 + X2 + X3, data = datz)
+    ps_lm_mod <- lm(A ~ X1 + X2 + X3 + X4 + X5, data = datz)
     ps_lm <- predict(ps_lm_mod)
     lm_wts <- dnorm(A, mean = mean(A), sd = sd(A)) / dnorm(A, mean = ps_lm, sd = sd(ps_lm_mod$residuals))
     lm_wts <- lm_wts / sum(lm_wts)
     # CBPS 
     
-    cbpsmod <- CBPS::CBPS(A ~ X1 + X2 + X3, data = datz, print.level = 0, method = 'exact')
+    cbpsmod <- CBPS::CBPS(A ~ X1 + X2 + X3+ X4 + X5, data = datz, print.level = 0, method = 'exact')
     
-    junkmsg <- capture.output(npcbpsmod1 <- CBPS::npCBPS(A ~ X1 + X2 + X3, 
+    junkmsg <- capture.output(npcbpsmod1 <- CBPS::npCBPS(A ~ X1 + X2 + X3 + X4 + X5, 
                                                          data = datz, 
                                                          corprior = 1e-8, print.level = 0))
     
-    junkmsg <- capture.output(npcbpsmod2 <- CBPS::npCBPS(A ~ poly(X1,2) + poly(X2,2) + X3, 
+    junkmsg <- capture.output(npcbpsmod2 <- CBPS::npCBPS(A ~ poly(X1,2) + poly(X2,2) + poly(X3,2) + poly(X4,2) + X5, 
                                                          data = datz, 
                                                          corprior = 1e-8, print.level = 0))
     
-    junkmsg <- capture.output(npcbpsmod3 <- CBPS::npCBPS(A ~ poly(X1,3) + poly(X2,3) + X3, 
+    junkmsg <- capture.output(npcbpsmod3 <- CBPS::npCBPS(A ~ poly(X1,3) + poly(X2,3) + poly(X3,3) + poly(X4,3) + X5, 
                                                          data = datz, 
                                                          corprior = 1e-8, print.level = 0))
     
-    junkmsg <- capture.output(npcbpsmod4 <- CBPS::npCBPS(A ~ poly(X1,4) + poly(X2,4) + X3, 
+    junkmsg <- capture.output(npcbpsmod4 <- CBPS::npCBPS(A ~ poly(X1,4) + poly(X2,4) + poly(X3,4) + poly(X4,4) + X5, 
                                                          data = datz, 
                                                          corprior = 1e-8, print.level = 0))
     

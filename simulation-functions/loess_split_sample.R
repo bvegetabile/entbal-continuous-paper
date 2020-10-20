@@ -28,23 +28,23 @@ loess_split_sample <- function(outcome,
       dat$W[folds == f] <- ebmod$wts
     } else if (model == 'npCBPS') {
       if(n_moments == 1){
-        junkmsg <- capture.output(npcbpsmod <- CBPS::npCBPS(A ~ X1 + X2 + X3, 
+        junkmsg <- capture.output(npcbpsmod <- CBPS::npCBPS(A ~ X1 + X2 + X3 + X4 + X5, 
                                                             data = dat[folds == f, ], 
                                                             corprior = 1e-8, print.level = 0))  
       } else {
-        junkmsg <- capture.output(npcbpsmod <- CBPS::npCBPS(A ~ poly(X1,n_moments) + poly(X2,n_moments) + X3, 
+        junkmsg <- capture.output(npcbpsmod <- CBPS::npCBPS(A ~ poly(X1,n_moments) + poly(X2,n_moments) + poly(X3,n_moments) + poly(X4,n_moments) + X5, 
                                                             data = dat[folds == f, ], 
                                                             corprior = 1e-8, print.level = 0))
       }
       dat$W[folds == f] <- npcbpsmod$weights
     } else if (model == 'CBPS'){
-      cbpsmod <- CBPS::CBPS(A ~ X1 + X2 + X3, data = dat[folds==f,], print.level = 0, method = 'exact')
+      cbpsmod <- CBPS::CBPS(A ~ X1 + X2 + X3 + X4 + X5, data = dat[folds==f,], print.level = 0, method = 'exact')
       dat$W[folds == f] <- cbpsmod$weights
     } else if (model == 'none'){
       dat$W[folds == f] <- 1 / length(dat$W[folds == f])
     } else if ( model == 'linear'){
       Af <- dat$A[folds == f]
-      ps_lm_mod <- lm(A ~ X1 + X2 + X3, data = dat[folds == f,])
+      ps_lm_mod <- lm(A ~ X1 + X2 + X3 + X4 + X5, data = dat[folds == f,])
       ps_lm <- predict(ps_lm_mod)
       lm_wts <- dnorm(Af, mean = mean(Af), sd = sd(Af)) / dnorm(Af, mean = ps_lm, sd = sd(ps_lm_mod$residuals))
       lm_wts <- lm_wts / sum(lm_wts)
