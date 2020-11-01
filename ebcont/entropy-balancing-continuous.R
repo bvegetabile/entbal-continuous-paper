@@ -1,3 +1,36 @@
+makeCA <- function(XD,A, n_moments = 3){
+  NC <- ncol(XD)
+  NR <- nrow(XD)
+  outmat <- matrix(NA, nrow = NR, ncol = 0)
+  #covariance 
+  for(c in 1:NC){
+    nuniq <- length(unique(XD[,c]))
+    if(nuniq <= 1) {
+      message(paste('Column: ', 
+                    colnames(XD)[c], 
+                    ', has <= 1 unique value and was not included'))
+    } else if(nuniq == 2) {
+      outmat <- cbind(outmat, scale(XD[,c]) * scale(A))
+    } else {
+      for(p in 1:n_moments){
+        outmat <- cbind(outmat, scale(XD[,c]**p) * scale(A))
+      }  
+    }
+  }
+  for(c in 1:NC){
+    nuniq <- length(unique(XD[,c]))
+    if(nuniq == 2 ) {
+      outmat <- cbind(outmat, scale(XD[,c])) 
+    } else {
+      outmat <- cbind(outmat, poly(XD[,c], n_moments))   
+    }
+    
+  }
+  outmat <- cbind(outmat, scale(A))
+  
+  outmat
+}
+
 makeC2 <- function(XD,A, n_moments = 3){
   NC <- ncol(XD)
   NR <- nrow(XD)
