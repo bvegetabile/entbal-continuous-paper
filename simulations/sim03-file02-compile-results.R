@@ -1,3 +1,5 @@
+setwd('/home/RAND.ORG/bvegetab/git/entbal-continuous-paper')
+
 source('simulation-functions/load_all_funcs_and_libs.R')
 
 # ------------------------------------------------------------------------
@@ -7,7 +9,7 @@ source('simulations/simulation-parameters-01.R')
 
 # Reading in results ---------------
 
-simout <- readRDS('output/sim1-output1-effect-estimation.RDS')
+simout <- readRDS('output/sim3-output1-smalln-effect-estimation.RDS')
 
 truth <- - 0.15 * A_test^2 + A_test * (2 + MX1^2 + MX2^2) - 15 #+ 5 * (1 + MX1^2 + 6 * MX1 + 9) + 15 * (1 + MX2^2 + 6 * MX2 + 9) + MX3
 truth <- truth / 50
@@ -143,7 +145,7 @@ smther <- loess(Y ~ A, data = out$dat, span = aspan)
 
 # Visualizations --------------------------------------------------
 
-pdf('paper-figures/fig1.pdf', height = 4, width = 9)
+pdf('paper-figures/smalln/smalln-fig1.pdf', height = 4, width = 9)
 par(mfrow=c(1,2), oma = c(0,0,0,0))
 hist(out$dat$A,
      breaks = seq(0, 65, 2.5),
@@ -170,7 +172,7 @@ lines(A50, truth50, lwd = 3, col = 'red')
 dev.off()
 
 
-pdf('paper-figures/eb-response-loess.pdf', height = 6, width = 12)
+pdf('paper-figures/smalln/smalln-eb-response-loess.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_loess[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
@@ -201,7 +203,7 @@ plot_sim(t(ests_loess[,11,]), atest = A_test, truth = truth, aquants = Aquants,
 dev.off()
 
 
-pdf('paper-figures/eb-response-lmmod1.pdf', height = 6, width = 12)
+pdf('paper-figures/smalln/smalln-eb-response-lmmod1.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_lmmod1[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
@@ -232,7 +234,7 @@ plot_sim(t(ests_lmmod1[,11,]), atest = A_test, truth = truth, aquants = Aquants,
 dev.off()
 
 
-pdf('paper-figures/eb-response-lmmod2.pdf', height = 6, width = 12)
+pdf('paper-figures/smalln/smalln-eb-response-lmmod2.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_lmmod2[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
@@ -263,7 +265,7 @@ plot_sim(t(ests_lmmod2[,11,]), atest = A_test, truth = truth, aquants = Aquants,
 dev.off()
 
 
-pdf('paper-figures/eb-response-splmod.pdf', height = 6, width = 12)
+pdf('paper-figures/smalln/smalln-eb-response-splmod.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_splmod[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
@@ -446,7 +448,7 @@ headings <- c('Unweighted',
               'CBPS - Nonparametric: (4)',
               'GBM')
 
-pdf('paper-figures/sim1-bias-dists.pdf', height = 6, width = 12)
+pdf('paper-figures/smalln/smalln-sim3-bias-dists.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,6,2,2)+0.1)
 
 for(c in c(1,6,7,12,2:5,8:11)){

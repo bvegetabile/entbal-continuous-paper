@@ -49,6 +49,10 @@ loess_split_sample <- function(outcome,
       lm_wts <- dnorm(Af, mean = mean(Af), sd = sd(Af)) / dnorm(Af, mean = ps_lm, sd = sd(ps_lm_mod$residuals))
       lm_wts <- lm_wts / sum(lm_wts)
       dat$W[folds == f] <- lm_wts
+    } else if (model == 'GBM') {
+      Af <- dat$A[folds == f]
+      gbm_wts <- gbm_weights(Af, covariates[folds == f, ])
+      dat$W[folds == f] <- gbm_wts$wts
     }
   }
   for(f in 1:nfolds){

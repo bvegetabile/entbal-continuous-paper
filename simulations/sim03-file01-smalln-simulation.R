@@ -8,9 +8,9 @@ source('simulations/simulation-parameters-01.R')
 
 # #--- Visualizing one span solution
 set.seed(20200109)
-n_obs <- 1000
+n_obs <- 200
 t1 <- system.time(testdat <- simrun(X=33, n_obs = n_obs, MX1 = MX1, MX2 = MX2, MX3 = MX3, lite_version = F))
-
+print(t1)
 
 system.time(mod1 <- loess_split_sample(testdat$dat$Y, testdat$dat$A, testdat$dat[,3:7], 
                                        n_moments = 3, spans = seq(0.05,1,0.05), plot_curves = T))
@@ -39,7 +39,7 @@ system.time(simout <- foreach(i = 1:n_sims,
                               .packages = c('CBPS', 'splines2', 'gbm'),
                               # .errorhandling = 'remove',
                               .verbose = T) 
-            %dopar% simrun(i, n_obs = 1000,
+            %dopar% simrun(i, n_obs = 200,
                            MX1 = MX1, MX2 = MX2, MX3 = MX3, 
                            amin = amin, amax = amax,
                            a_effect = T, lite_version = F))
@@ -47,4 +47,4 @@ stopCluster(cl)
 
 # Storing simulation results 
 
-saveRDS(simout, file = 'output/sim1-output1-effect-estimation-test.RDS')
+saveRDS(simout, file = 'output/sim3-output1-smalln-effect-estimation.RDS')

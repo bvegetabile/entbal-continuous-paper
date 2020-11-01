@@ -2,14 +2,12 @@ source('simulation-functions/load_all_funcs_and_libs.R')
 
 # ------------------------------------------------------------------------
 # Simulation parameters ------
-source('simulations/simulation-parameters-01.R')
-
-# ------------------------------------------------------------------------
+source('simulations/simulation-parameters-02.R')
 
 # #--- Visualizing one span solution
 set.seed(20200109)
 n_obs <- 1000
-t1 <- system.time(testdat <- simrun(X=33, n_obs = n_obs, MX1 = MX1, MX2 = MX2, MX3 = MX3, lite_version = F))
+t1 <- system.time(testdat <- simrun(X=33, n_obs = n_obs, MX1 = MX1, MX2 = MX2, MX3 = MX3, lite_version = T, a_effect = FALSE))
 
 
 system.time(mod1 <- loess_split_sample(testdat$dat$Y, testdat$dat$A, testdat$dat[,3:7], 
@@ -22,7 +20,6 @@ naive <- model_estimation(testdat$dat, testpts = A_test)
 plot(testdat$dat$A, testdat$dat$Y, pch = 19, col = rgb(0,0,0,0.25))
 lines(A_test, truth, type = 'l', lwd = 3, col = 'red')
 lines(A_test, testdat$truth, type = 'l', lwd = 3, col = 'red')
-lines(A_test, testdat$gbm$ests_loess, lwd = 10)
 lines(A_test, outro$ests_loess, lwd = 5, col = 'blue')
 lines(A_test, outro$ests_splmod, lwd = 5, col = 'darkgreen')
 lines(A_test, outro$ests_lmmod2, lwd = 5, col = 'orange')
@@ -42,9 +39,9 @@ system.time(simout <- foreach(i = 1:n_sims,
             %dopar% simrun(i, n_obs = 1000,
                            MX1 = MX1, MX2 = MX2, MX3 = MX3, 
                            amin = amin, amax = amax,
-                           a_effect = T, lite_version = F))
+                           a_effect = F, lite_version = F))
 stopCluster(cl)
 
 # Storing simulation results 
 
-saveRDS(simout, file = 'output/sim1-output1-effect-estimation-test.RDS')
+saveRDS(simout, file = 'output/sim2-output1-effect-estimation.RDS')

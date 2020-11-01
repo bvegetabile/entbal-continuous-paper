@@ -2,15 +2,14 @@ source('simulation-functions/load_all_funcs_and_libs.R')
 
 # ------------------------------------------------------------------------
 # Simulation parameters ------
-source('simulations/simulation-parameters-01.R')
+source('simulations/simulation-parameters-02.R')
 # ------------------------------------------------------------------------
 
 # Reading in results ---------------
 
-simout <- readRDS('output/sim1-output1-effect-estimation.RDS')
+simout <- readRDS('output/sim2-output1-effect-estimation.RDS')
 
-truth <- - 0.15 * A_test^2 + A_test * (2 + MX1^2 + MX2^2) - 15 #+ 5 * (1 + MX1^2 + 6 * MX1 + 9) + 15 * (1 + MX2^2 + 6 * MX2 + 9) + MX3
-truth <- truth / 50
+truth <- rep(MX1 + (MX1^2 + 1) + MX2 + (MX2^2 + 1) + MX1 * MX2 + MX3, 100)
 
 ests_loess <- simplify2array(lapply(simout, function(x) cbind(x$unwtd$ests_loess,
                                                               x$eb1$ests_loess,
@@ -137,13 +136,13 @@ set.seed(20200108)
 
 out <- simout[[1]]
 A50 <- seq(amin, 65, length.out = 100)
-truth50 <- (- 0.15 * A50^2 + A50 * (2 + MX1^2 + MX2^2) - 15) / 50
+truth50 <- rep(MX1 + (MX1^2 + 1) + MX2 + (MX2^2 + 1) + MX1 * MX2 + MX3, 100)
 aspan <- 0.45
 smther <- loess(Y ~ A, data = out$dat, span = aspan)
 
 # Visualizations --------------------------------------------------
 
-pdf('paper-figures/fig1.pdf', height = 4, width = 9)
+pdf('paper-figures/ne-fig1.pdf', height = 4, width = 9)
 par(mfrow=c(1,2), oma = c(0,0,0,0))
 hist(out$dat$A,
      breaks = seq(0, 65, 2.5),
@@ -170,127 +169,127 @@ lines(A50, truth50, lwd = 3, col = 'red')
 dev.off()
 
 
-pdf('paper-figures/eb-response-loess.pdf', height = 6, width = 12)
+pdf('paper-figures/ne-eb-response-loess.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_loess[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 plot_sim(t(ests_loess[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 plot_sim(t(ests_loess[,7,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS - Parametric')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS - Parametric')
 plot_sim(t(ests_loess[,12,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'GBM')
+         ylimits = c(0,10), ylines = 2, maintitle = 'GBM')
 
 plot_sim(t(ests_loess[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 plot_sim(t(ests_loess[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 plot_sim(t(ests_loess[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 plot_sim(t(ests_loess[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 
 plot_sim(t(ests_loess[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 plot_sim(t(ests_loess[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 plot_sim(t(ests_loess[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 plot_sim(t(ests_loess[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 dev.off()
 
 
-pdf('paper-figures/eb-response-lmmod1.pdf', height = 6, width = 12)
+pdf('paper-figures/ne-eb-response-lmmod1.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_lmmod1[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 plot_sim(t(ests_lmmod1[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 plot_sim(t(ests_lmmod1[,7,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS - Parametric')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS - Parametric')
 plot_sim(t(ests_lmmod1[,12,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'GBM')
+         ylimits = c(0,10), ylines = 2, maintitle = 'GBM')
 
 plot_sim(t(ests_lmmod1[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 plot_sim(t(ests_lmmod1[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 plot_sim(t(ests_lmmod1[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 plot_sim(t(ests_lmmod1[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 
 plot_sim(t(ests_lmmod1[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 plot_sim(t(ests_lmmod1[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 plot_sim(t(ests_lmmod1[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 plot_sim(t(ests_lmmod1[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 dev.off()
 
 
-pdf('paper-figures/eb-response-lmmod2.pdf', height = 6, width = 12)
+pdf('paper-figures/ne-eb-response-lmmod2.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_lmmod2[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 plot_sim(t(ests_lmmod2[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 plot_sim(t(ests_lmmod2[,7,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS - Parametric')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS - Parametric')
 plot_sim(t(ests_lmmod2[,12,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'GBM')
+         ylimits = c(0,10), ylines = 2, maintitle = 'GBM')
 
 plot_sim(t(ests_lmmod2[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 plot_sim(t(ests_lmmod2[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 plot_sim(t(ests_lmmod2[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 plot_sim(t(ests_lmmod2[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 
 plot_sim(t(ests_lmmod2[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 plot_sim(t(ests_lmmod2[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 plot_sim(t(ests_lmmod2[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 plot_sim(t(ests_lmmod2[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 dev.off()
 
 
-pdf('paper-figures/eb-response-splmod.pdf', height = 6, width = 12)
+pdf('paper-figures/ne-eb-response-splmod.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,4,1,1)+0.1)
 plot_sim(t(ests_splmod[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 plot_sim(t(ests_splmod[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 plot_sim(t(ests_splmod[,7,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS - Parametric')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS - Parametric')
 plot_sim(t(ests_splmod[,12,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'GBM')
+         ylimits = c(0,10), ylines = 2, maintitle = 'GBM')
 
 plot_sim(t(ests_splmod[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 plot_sim(t(ests_splmod[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 plot_sim(t(ests_splmod[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 plot_sim(t(ests_splmod[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 
 plot_sim(t(ests_splmod[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 plot_sim(t(ests_splmod[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 plot_sim(t(ests_splmod[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 plot_sim(t(ests_splmod[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-         ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+         ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 dev.off()
 
 
@@ -299,77 +298,77 @@ dev.off()
 # pdf('paper-figures/eb-response-lmmod1.pdf', height = 4, width = 12)
 # par(mfrow=c(2,5), oma = c(0,0,0,0), mar = c(4,4,2,2)+0.1)
 # plot_sim(t(ests_lmmod1[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 # plot_sim(t(ests_lmmod1[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 # plot_sim(t(ests_lmmod1[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 # plot_sim(t(ests_lmmod1[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 # plot_sim(t(ests_lmmod1[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 # 
 # plot_sim(t(ests_lmmod1[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 # plot_sim(t(ests_lmmod1[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 # plot_sim(t(ests_lmmod1[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 # plot_sim(t(ests_lmmod1[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 # plot_sim(t(ests_lmmod1[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 # dev.off()
 # 
 # pdf('paper-figures/eb-response-lmmod2.pdf', height = 4, width = 12)
 # par(mfrow=c(2,5), oma = c(0,0,0,0), mar = c(4,4,2,2)+0.1)
 # plot_sim(t(ests_lmmod2[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 # plot_sim(t(ests_lmmod2[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 # plot_sim(t(ests_lmmod2[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 # plot_sim(t(ests_lmmod2[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 # plot_sim(t(ests_lmmod2[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 # 
 # plot_sim(t(ests_lmmod2[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 # plot_sim(t(ests_lmmod2[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 # plot_sim(t(ests_lmmod2[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 # plot_sim(t(ests_lmmod2[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 # plot_sim(t(ests_lmmod2[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 # dev.off()
 # 
 # 
 # pdf('paper-figures/eb-response-splmod.pdf', height = 4, width = 12)
 # par(mfrow=c(2,5), oma = c(0,0,0,0), mar = c(4,4,2,2)+0.1)
 # plot_sim(t(ests_splmod[,1,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Unweighted')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Unweighted')
 # plot_sim(t(ests_splmod[,2,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (1)')
 # plot_sim(t(ests_splmod[,3,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (2)')
 # plot_sim(t(ests_splmod[,4,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (3)')
 # plot_sim(t(ests_splmod[,5,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Entropy Balancing: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Entropy Balancing: (4)')
 # 
 # plot_sim(t(ests_splmod[,6,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'Linear Model')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'Linear Model')
 # plot_sim(t(ests_splmod[,8,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (1)')
 # plot_sim(t(ests_splmod[,9,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (2)')
 # plot_sim(t(ests_splmod[,10,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (3)')
 # plot_sim(t(ests_splmod[,11,]), atest = A_test, truth = truth, aquants = Aquants, 
-#          ylimits = c(-5,5), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
+#          ylimits = c(0,10), ylines = 2, maintitle = 'CBPS Nonparametric: (4)')
 # dev.off()
 # 
 
@@ -446,7 +445,7 @@ headings <- c('Unweighted',
               'CBPS - Nonparametric: (4)',
               'GBM')
 
-pdf('paper-figures/sim1-bias-dists.pdf', height = 6, width = 12)
+pdf('paper-figures/ne-sim2-bias-dists.pdf', height = 6, width = 12)
 par(mfrow=c(3,4), oma = c(0,0,0,0), mar = c(4,6,2,2)+0.1)
 
 for(c in c(1,6,7,12,2:5,8:11)){
@@ -463,7 +462,7 @@ for(c in c(1,6,7,12,2:5,8:11)){
        axes = F)
   abline(v = 0, lwd = 3, col = rgb(0,0,0,0.25))
   axis(1)
-  axis(2, at = 4:1, c('B-Spline', 'LOESS', 'Correct Spec.', 'Misspecified'), las = 2)
+  axis(2, at = 4:1, c('B-Spline', 'LOESS', 'Quadratic', 'Linear Model'), las = 2)
   points(c(bias1[c], bias2[c], bias3[c], bias4[c]), c(1,2,3,4), pch = 19,)
   lines(bias_quant1[c(1,4),c], rep(1,2), col = rgb(0,0,0,0.5))
   lines(bias_quant2[c(1,4),c], rep(2,2), col = rgb(0,0,0,0.5))

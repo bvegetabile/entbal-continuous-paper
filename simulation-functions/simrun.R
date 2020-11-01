@@ -33,8 +33,11 @@ simrun <- function(X,
   A <- rchisq(n_obs, df = 3, ncp = muA)
   
   if(a_effect){
-    Y <- - (A + 5) * (A - 5) / 300 + A * (X1^2 + X2^2) / 25 + X1 + X2 + X5 + rnorm(n_obs, sd = 1)
-    truth <- - (A_test + 5) * (A_test - 5) / 300 + A_test * (2 + MX1^2 + MX2^2) / 25 + MX1 + MX2 + MX3
+    Y <- - 0.15 * A^2 + A * (X1^2 + X2^2) - 15 + (X1+3)^2 + 2 * (X2-25)^2 + X3 + rnorm(n_obs, sd = 1) - ((1 + MX1^2 + 6 * MX1 + 9) + 2 * (1 + MX2^2 - 50 * MX2 + 625))
+    Y <- Y / 50
+    truth <- - 0.15 * A_test^2 + A_test * (2 + MX1^2 + MX2^2) - 15 #+ 5 * (1 + MX1^2 + 6 * MX1 + 9) + 15 * (1 + MX2^2 + 6 * MX2 + 9) + MX3
+    truth <- truth / 50
+    # truth <- - (A_test - 10) * (A_test - 10) / 5 + 5* A_test * (2 + MX1^2 + MX2^2) / 1 - 15 * (MX1 - MX2) + MX3 + (1 + MX2^2 - 40 * MX2 + 400)
   } else {
     Y <- X1 + X1^2 + X2 + X2^2 + X1 * X2 + X5 + rnorm(n_obs, sd = 1)
     truth <- rep(MX1 + (MX1^2 + 1) + MX2 + (MX2^2 + 1) + MX1 * MX2 + MX3 , 100)
@@ -77,10 +80,10 @@ simrun <- function(X,
   
   # Proposed Method
   
-  mod_eb1 <- model_estimation(datz, ebz1$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test)
-  mod_eb2 <- model_estimation(datz, ebz2$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test)
-  mod_eb3 <- model_estimation(datz, ebz3$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test)
-  mod_eb4 <- model_estimation(datz, ebz4$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test)
+  mod_eb1 <- model_estimation(datz, ebz1$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, nm = 1)
+  mod_eb2 <- model_estimation(datz, ebz2$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, nm = 2)
+  mod_eb3 <- model_estimation(datz, ebz3$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, nm = 3)
+  mod_eb4 <- model_estimation(datz, ebz4$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, nm = 4)
   
   if(!lite_version){
     # linear model weights
@@ -108,6 +111,11 @@ simrun <- function(X,
                                                          data = datz, 
                                                          corprior = 1e-8, print.level = 0))
     
+    # GBM Weights
+    gbmwts <- gbm_weights(datz$A, datz[,3:7], 1000)
+    
+    # Estimation
+    
     mod_unwtd <- model_estimation(datz, poly_reg = T, wts = rep(1/n_obs, n_obs),  p = ifelse(a_effect, 2, 1), A_test,
                                   which_model = 'none')
     mod_lm <- model_estimation(datz, lm_wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test,
@@ -117,6 +125,7 @@ simrun <- function(X,
     mod_npcbps2 <- model_estimation(datz, npcbpsmod2$weights, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, which_model = 'npCBPS')
     mod_npcbps3 <- model_estimation(datz, npcbpsmod3$weights, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, which_model = 'npCBPS')
     mod_npcbps4 <- model_estimation(datz, npcbpsmod4$weights, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, which_model = 'npCBPS')
+    mod_gbm <- model_estimation(datz, gbmwts$wts, poly_reg = T, p = ifelse(a_effect, 2, 1), A_test, which_model = 'GBM')
     
     return(
       list(
@@ -131,6 +140,7 @@ simrun <- function(X,
         'npcbps2' = mod_npcbps2,
         'npcbps3' = mod_npcbps3,
         'npcbps4' = mod_npcbps4,
+        'gbm' = mod_gbm,
         'dat' = datz,
         'truth' = truth)
     )
