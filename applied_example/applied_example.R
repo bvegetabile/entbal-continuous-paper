@@ -464,3 +464,135 @@ ss_spans3 <- function(x){
   loess_split_sample(Y2, A, XD, n_moments = 3, model = 'EB', spans = seq(0.2, 1, by = 0.05))$best_span
 }
 
+
+options(cores = 8)
+cl <- makeCluster(8)
+registerDoParallel(cl)
+system.time(cvspans2 <- foreach(i = 1:100,
+                               .errorhandling = 'remove',
+                               .verbose = T)
+            %dopar% ss_spans2(i))
+stopCluster(cl)
+hist(unlist(cvspans))
+bspan2 <- mean(unlist(cvspans2))
+
+
+options(cores = 12)
+cl <- makeCluster(12)
+registerDoParallel(cl)
+system.time(cvspans3 <- foreach(i = 1:100,
+                                .errorhandling = 'remove',
+                                .verbose = T)
+            %dopar% ss_spans0(i))
+stopCluster(cl)
+hist(unlist(cvspans0))
+bspan3 <- mean(unlist(cvspans3))
+
+
+
+loessmod2 <- loess(Y2 ~ A, weights = ebz$wts, span = bspan2, degree = 1)
+
+options(cores = 12)
+cl <- makeCluster(12)
+registerDoParallel(cl)
+system.time(bsests2 <- foreach(i = 1:100,
+                               .errorhandling = 'remove',
+                               .combine = 'rbind',
+                               .verbose = T)
+            %dopar% bsest_example(i, XD, A, Y2))
+stopCluster(cl)
+
+lower <- predict(loessmod2, newdata = data.frame(A = seq(0, tmax, by = 1))) - 1.96 * apply(bsests2, 2, sd)
+upper <- predict(loessmod2, newdata = data.frame(A = seq(0, tmax, by = 1))) + 1.96 * apply(bsests2, 2, sd)
+
+# Other models
+loessmod4 <- loess(Y2 ~ A, span = bspan0, degree = 1)
+naive_lmmod <- glm(recov_6 ~ sncnt, data = dset, family = 'binomial')
+contr_lmmod <- glm(recov_6 ~ sncnt + recov_0, data = dset, family = 'binomial')
+wtd_lmmod <- glm(recov_6 ~ sncnt, data = dset, weights = ebz$wts, family = 'binomial')
+
+treatvals <- seq(0, tmax, by = 0.5)
+
+
+
+
+pdf('paper-figures/sessions-withengagement-appfig3-1.pdf', height = 4, width = 12)
+par(mfrow=c(1,3))
+plot(dset$sncnt,
+     jitter(dset$recov_6, amount = 0.025),
+     xlim = c(0,tmax), col = rgb(0,0,0,0.1),
+     pch = 19,
+     xlab = 'Number of Sessions',
+     ylab = 'In Recovery - 6 Month', axes = F,
+     ylim = c(0,1))
+lines(treatvals,
+      predict(loessmod2,
+              newdata = data.frame(A = treatvals)),
+      col = rgb(0,0,0.75,1), lwd = 4)
+axis(1); axis(2, las = 2)
+lines(seq(0, tmax, by = 1),
+      lower,
+      col = rgb(0,0,0.75,1), lwd = 2, lty = 2)
+lines(seq(0, tmax, by = 1),
+      upper,
+      col = rgb(0,0,0.75,1), lwd = 2, lty = 2)
+abline(h = 0.5, lwd =2, col = rgb(0.75, 0,0,0.5))
+
+plot(treatvals,
+     predict(loessmod2,
+             newdata = data.frame(A = treatvals)),
+     type = 'l',
+     xlim = c(0,tmax), c(min(lower,na.rm=T),max(upper,na.rm=T)),
+     col = rgb(0,0,0.75,1), lwd = 3,
+     xlab = 'Number of Sessions',
+     ylab = 'In Recovery - 6 Month', axes = F)
+axis(1); axis(2, las = 2)
+lines(seq(0, tmax, by = 1),
+      lower,
+      col = rgb(0,0,0.75,1), lwd = 2, lty = 2)
+lines(seq(0, tmax, by = 1),
+      upper,
+      col = rgb(0,0,0.75,1), lwd = 2, lty = 2)
+abline(h = seq(0,1,0.1), lty = 3)
+
+plot(treatvals,
+     predict(loessmod2,
+             newdata = data.frame(A = treatvals)),
+     type = 'l',
+     xlim = c(0,tmax), c(min(lower,na.rm=T),max(upper,na.rm=T)),
+     col = rgb(0,0,0.75,1), lwd = 3,
+     xlab = 'Number of Sessions',
+     ylab = 'In Recovery - 6 Month', axes = F)
+axis(1); axis(2, las = 2)
+lines(treatvals, predict(loessmod4,
+                         newdata = data.frame(A = treatvals)),
+      lwd = 3, col = rgb(0,0,0,0.5), lty = 2)
+lines(treatvals,
+      predict(naive_lmmod, newdata = data.frame(sncnt = treatvals), type = 'response'),
+      col = rgb(0.75,0,0,0.5), lwd = 3)
+lines(treatvals,
+      predict(contr_lmmod, newdata = data.frame(sncnt = treatvals,
+                                                recov_0 = mean(dset$recov_0)),
+              type = 'response'),
+      col = rgb(0.75,0,0,0.5), lwd = 3, lty = 2)
+lines(treatvals,
+      predict(wtd_lmmod, newdata = data.frame(sncnt = treatvals), type = 'response'),
+      col = rgb(0,0,0.75,0.5), lwd = 3, lty=2)
+abline(h = seq(0,1,0.1), lty = 3)
+legend('bottomright',
+       c('EB + LOESS',
+         'Naive LOESS',
+         'Naive Reg.',
+         'Baseline Control',
+         'Wtd. Reg. - EB'),
+       lwd = 3, lty = c(1,2,1,2,2),
+       bg = 'white',
+       col = c(rgb(0,0,0.75,0.75),
+               rgb(0,0,0,0.5),
+               rgb(0.75,0,0,0.5),
+               rgb(0.75,0,0,0.5),
+               rgb(0,0,0.75,0.5)),
+       cex = 1.5)
+title('\n\nRelationship between Number of Sessions and In Recovery Status at 6-Months', outer = T)
+dev.off()
+
