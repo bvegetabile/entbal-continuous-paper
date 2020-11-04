@@ -49,12 +49,15 @@ for(s in 1:n_sims){
   
   A <- rchisq(n_obs, df = 3, ncp = muA)
   
-  datz <- data.frame(Y, A, 'X1' = Z1, 'X2' = Z2, 'X3' = Z3, 'X4' = Z4, 'X5' = Z5)
-  
   Y <- - 0.15 * A^2 + A * (X1^2 + X2^2) - 15 + (X1+3)^2 + 2 * (X2-25)^2 + X3 + rnorm(n_obs, sd = 1) - ((1 + MX1^2 + 6 * MX1 + 9) + 2 * (1 + MX2^2 - 50 * MX2 + 625))
   Y <- Y / 50
   truth <- - 0.15 * A_test^2 + A_test * (2 + MX1^2 + MX2^2) - 15 #+ 5 * (1 + MX1^2 + 6 * MX1 + 9) + 15 * (1 + MX2^2 + 6 * MX2 + 9) + MX3
   truth <- truth / 50
+  
+  
+  datz <- data.frame(Y, A, 'X1' = Z1, 'X2' = Z2, 'X3' = Z3, 'X4' = Z4, 'X5' = Z5)
+  
+
   
   CZ1 <- makeC2(datz[,3:7], datz$A, n_moments = 1)
   CZ2 <- makeC2(datz[,3:7], datz$A, n_moments = 2)
@@ -148,8 +151,8 @@ for(i in 1:4){
   for(j in 1:4){
     # moments
     outro <- c(
-      mean(apply(biasres1[j,i,,], 1, mean)),
-      mean(apply(biasres2[j,i,,], 1, mean))  
+      mean(apply(biasres1[j,i,,], 1, mean, na.rm = T)),
+      mean(apply(biasres2[j,i,,], 1, mean, na.rm = T))  
     )
     print(round(outro,4))
   }

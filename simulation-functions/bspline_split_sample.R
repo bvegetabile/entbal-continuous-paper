@@ -62,7 +62,7 @@ bspline_split_sample <- function(outcome,
       traindat <- dat[folds != f, ]
       testdat <- dat[folds == f, ]
       
-      trainmod <- lm(Y ~ bSpline(A, df = DF, Boundary.knots = c(0, max(dat$A))),
+      trainmod <- lm(Y ~ bs(A, df = DF, Boundary.knots = c(0, max(dat$A))),
                      weights = W, 
                      data = traindat)
       

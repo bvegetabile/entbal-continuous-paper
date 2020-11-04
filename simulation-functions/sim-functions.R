@@ -29,7 +29,7 @@ model_estimation <- function(dat,
   lmmod1 <- lm(Y ~ A, data = dat, weights = wts)
   lmmod2 <- lm(Y ~ poly(A,2), data = dat, weights = wts)
   arange <- c(0, max(dat$A))
-  splmod <- lm(Y ~ bSpline(A, df = dfs$best_df, Boundary.knots = arange), data = dat, weights = wts)
+  splmod <- lm(Y ~ bs(A, df = dfs$best_df, Boundary.knots = arange), data = dat, weights = wts)
   
   return(
     list(

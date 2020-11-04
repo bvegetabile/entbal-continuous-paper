@@ -1,5 +1,5 @@
 library(glmnet)
-library(splines2)
+library(splines)
 library(CBPS)
 library(parallel)
 library(doParallel)

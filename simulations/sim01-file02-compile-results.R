@@ -393,8 +393,8 @@ rownames(baltab2) <- rownames(baltab1) <- c('Unweighted',
 xtable::xtable(baltab1, digits = 3)
 xtable::xtable(baltab2, digits = 3)
 
-knitr::kable(baltab1, digits = 2)
-knitr::kable(baltab2, digits = 2)
+knitr::kable(baltab1, digits = 3)
+knitr::kable(baltab2, digits = 3)
 
 # Estimates -----
 
@@ -412,7 +412,7 @@ rownames(restab) <- c('Unweighted',
                       'CBPS - Nonparametric: (4)',
                       'GBM - Optimal Weights')
 xtable::xtable(restab, digits = 3)
-knitr::kable(restab, digits = 2)
+knitr::kable(restab, digits = 3)
 
 # 
 # 
