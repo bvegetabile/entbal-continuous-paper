@@ -8,7 +8,7 @@ source('simulations/simulation-parameters-02.R')
 set.seed(20200109)
 n_obs <- 1000
 t1 <- system.time(testdat <- simrun(X=33, n_obs = n_obs, MX1 = MX1, MX2 = MX2, MX3 = MX3, lite_version = T, a_effect = FALSE))
-
+print(t1)
 
 system.time(mod1 <- loess_split_sample(testdat$dat$Y, testdat$dat$A, testdat$dat[,3:7], 
                                        n_moments = 3, spans = seq(0.05,1,0.05), plot_curves = T))
@@ -33,7 +33,7 @@ options(cores = 20)
 cl <- makeCluster(20)
 registerDoParallel(cl)
 system.time(simout <- foreach(i = 1:n_sims, 
-                              .packages = c('CBPS', 'splines2', 'gbm'),
+                              .packages = c('CBPS', 'splines', 'gbm'),
                               # .errorhandling = 'remove',
                               .verbose = T) 
             %dopar% simrun(i, n_obs = 1000,

@@ -411,7 +411,7 @@ rownames(restab) <- c('Unweighted',
                       'CBPS - Nonparametric: (4)',
                       'GBM - Optimal Weights')
 xtable::xtable(restab, digits = 3)
-knitr::kable(restab, digits = 2)
+knitr::kable(restab, digits = 3)
 
 # 
 # 

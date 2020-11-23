@@ -36,7 +36,7 @@ options(cores = 20)
 cl <- makeCluster(20)
 registerDoParallel(cl)
 system.time(simout <- foreach(i = 1:n_sims, 
-                              .packages = c('CBPS', 'splines2', 'gbm'),
+                              .packages = c('CBPS', 'splines', 'gbm'),
                               # .errorhandling = 'remove',
                               .verbose = T) 
             %dopar% simrun(i, n_obs = 200,
