@@ -22,7 +22,7 @@ A_test <- seq(1.5, 45, length.out = n_pts)
 truth <- - 0.15 * A_test^2 + A_test * (2 + MX1^2 + MX2^2) - 15
 truth <- truth / 50
 
-n_sims <- 100
+n_sims <- 25
 n_obs <- 1000
 
 hm_array <- array(NA, c(4,4,n_sims,n_pts))
